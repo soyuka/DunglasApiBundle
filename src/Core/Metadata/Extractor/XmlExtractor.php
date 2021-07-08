@@ -11,11 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Extractor;
+namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\Extractor\XmlExtractor as XmlExtractorV3;
-use Symfony\Component\Config\Util\Exception\XmlParsingException;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -24,12 +22,11 @@ use Symfony\Component\Config\Util\XmlUtils;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- *
- * @deprecated since 2.7, to remove in 3.0 (replaced by ApiPlatform\Metadata\Extractor)
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class XmlExtractor extends AbstractExtractor
 {
-    public const RESOURCE_SCHEMA = __DIR__.'/../schema/metadata.xsd';
+    public const RESOURCE_SCHEMA = __DIR__.'/schema/metadata.xsd';
 
     /**
      * {@inheritdoc}
@@ -39,17 +36,6 @@ final class XmlExtractor extends AbstractExtractor
         try {
             /** @var \SimpleXMLElement $xml */
             $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::RESOURCE_SCHEMA));
-        } catch (XmlParsingException $e) {
-            // Invalid XML: maybe it's a v3 format
-            try {
-                simplexml_import_dom(XmlUtils::loadFile($path, XmlExtractorV3::RESOURCE_SCHEMA));
-
-                // It's a v3 format: ignore as there is another extractor for it
-                return;
-            } catch (XmlParsingException $xpe) {
-                // Invalid XML even in v3 format: throw original exception
-                throw $e;
-            }
         } catch (\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
@@ -57,16 +43,16 @@ final class XmlExtractor extends AbstractExtractor
         foreach ($xml->resource as $resource) {
             $resourceClass = $this->resolve((string) $resource['class']);
 
-            $this->resources[$resourceClass] = [
+            $this->resources[$resourceClass][] = [
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
                 'description' => $this->phpize($resource, 'description', 'string'),
-                'iri' => $this->phpize($resource, 'iri', 'string'),
-                'itemOperations' => $this->getOperations($resource, 'itemOperation'),
-                'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
-                'subresourceOperations' => $this->getOperations($resource, 'subresourceOperation'),
-                'graphql' => $this->getOperations($resource, 'operation'),
+                'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
+                'types' => $resource['types'] ?? null,
+                'operations' => $this->getOperations($resource, 'operation'),
+                'graphql' => $this->getOperations($resource, 'operation', true),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
+                'identifiers' => $this->getIdentifiers($resource) ?: null,
             ];
         }
     }
@@ -74,9 +60,8 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * Returns the array containing configured operations. Returns NULL if there is no operation configuration.
      */
-    private function getOperations(\SimpleXMLElement $resource, string $operationType): ?array
+    private function getOperations(\SimpleXMLElement $resource, string $operationType, bool $graphql = false): ?array
     {
-        $graphql = 'operation' === $operationType;
         if (!$graphql && $legacyOperations = $this->getAttributes($resource, $operationType)) {
             @trigger_error(
                 sprintf('Configuring "%1$s" tags without using a parent "%1$ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', $operationType),
@@ -102,9 +87,12 @@ final class XmlExtractor extends AbstractExtractor
         $attributes = [];
         foreach ($resource->{$elementName} as $attribute) {
             $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : XmlUtils::phpize($attribute);
-            // allow empty operations definition, like <collectionOperation name="post" />
+            // allow empty operations definition, like <collectionOperation name="post" /> or  <operation class="ApiPlatform\Metadata\Post" />
             if ($topLevel && '' === $value) {
                 $value = [];
+            }
+            if (isset($attribute['class'])) {
+                $value['class'] = (string) $attribute['class'];
             }
             if (isset($attribute['name'])) {
                 $attributes[(string) $attribute['name']] = $value;
@@ -142,6 +130,19 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         return $properties;
+    }
+
+    private function getIdentifiers(\SimpleXMLElement $resource): array
+    {
+        $identifiers = [];
+        foreach ($resource->identifier as $identifier) {
+            $identifiers[(string) $identifier['key']] = [
+                'class' => $this->phpize($identifier, 'class', 'string'),
+                'target' => $this->phpize($identifier, 'target', 'string'),
+            ];
+        }
+
+        return $identifiers;
     }
 
     /**

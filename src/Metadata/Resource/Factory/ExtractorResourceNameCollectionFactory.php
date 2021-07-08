@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface as LegacyExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\Extractor\ExtractorInterface;
 
 /**
  * Creates a resource name collection from {@see ApiResource} configuration files.
@@ -26,11 +27,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 final class ExtractorResourceNameCollectionFactory implements LegacyResourceNameCollectionFactoryInterface
 {
     private $extractor;
+    private $legacyExtractor;
     private $decorated;
 
-    public function __construct(ExtractorInterface $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(ExtractorInterface $extractor, LegacyExtractorInterface $legacyExtractor, ResourceNameCollectionFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
+        $this->legacyExtractor = $legacyExtractor;
         $this->decorated = $decorated;
     }
 
@@ -53,12 +56,7 @@ final class ExtractorResourceNameCollectionFactory implements LegacyResourceName
             }
         }
 
-        // TODO: Handle extractors
-        if (!$legacy) {
-            return new ResourceNameCollection(array_keys($classes));
-        }
-
-        foreach ($this->extractor->getResources() as $resourceClass => $resource) {
+        foreach (($legacy ? $this->legacyExtractor : $this->extractor)->getResources() as $resourceClass => $resource) {
             $classes[$resourceClass] = true;
         }
 

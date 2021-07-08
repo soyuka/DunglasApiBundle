@@ -10,7 +10,13 @@
             <argument type="service" id="service_container" />
         </service>
 
+        <service id="api_platform.metadata.resource_collection.extractor.yaml" class="ApiPlatform\Metadata\Extractor\YamlExtractor" public="false">
+            <argument type="collection" />
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="api_platform.metadata.resource.name_collection_factory.yaml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory" public="false">
+            <argument type="service" id="api_platform.metadata.resource_collection.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.yaml.inner" />
         </service>

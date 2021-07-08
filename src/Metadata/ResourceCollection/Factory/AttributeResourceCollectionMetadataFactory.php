@@ -83,7 +83,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
      *
      * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers)
      *
-     * @return resource[]
+     * @return Resource[]
      */
     private function buildResourceOperations(array $attributes, string $resourceClass): array
     {

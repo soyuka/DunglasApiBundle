@@ -1,0 +1,99 @@
+<?xml version="1.0" ?>
+
+<xsd:schema
+    xmlns="https://api-platform.com/schema/metadata-3.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="https://api-platform.com/schema/metadata-3.0"
+    elementFormDefault="qualified">
+
+    <xsd:element name="resources" type="resources"/>
+
+    <xsd:complexType name="resources">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="resource" type="resource"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="resource">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="operations" minOccurs="0" maxOccurs="unbounded" type="operations"/>
+            <xsd:element name="identifiers" minOccurs="0" maxOccurs="unbounded" type="identifiers"/>
+            <xsd:element name="types" minOccurs="0" maxOccurs="unbounded" type="types"/>
+            <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
+            <xsd:element name="property" minOccurs="0" maxOccurs="unbounded" type="property"/>
+            <xsd:element name="graphql" minOccurs="0" type="graphql"/>
+        </xsd:sequence>
+
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:string" name="shortName"/>
+        <xsd:attribute type="xsd:string" name="description"/>
+        <xsd:attribute type="xsd:string" name="uriTemplate"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="operations">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="operation" minOccurs="0" maxOccurs="unbounded" type="operation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="operation">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="types">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="type" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="identifiers">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="identifier" minOccurs="0" maxOccurs="unbounded" type="identifier"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="identifier">
+        <xsd:attribute type="xsd:string" name="key" use="required"/>
+        <xsd:attribute type="xsd:string" name="class"/>
+        <xsd:attribute type="xsd:string" name="target"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphql">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="operation" minOccurs="0" maxOccurs="unbounded" type="graphql-operation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphql-operation">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="attribute" mixed="true">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="attribute" type="attribute" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="property">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name"/>
+        <xsd:attribute type="xsd:string" name="description"/>
+        <xsd:attribute type="xsd:string" name="iri"/>
+        <xsd:attribute type="xsd:boolean" name="readable"/>
+        <xsd:attribute type="xsd:boolean" name="writable"/>
+        <xsd:attribute type="xsd:boolean" name="readableLink"/>
+        <xsd:attribute type="xsd:boolean" name="writableLink"/>
+        <xsd:attribute type="xsd:boolean" name="required"/>
+        <xsd:attribute type="xsd:boolean" name="identifier"/>
+    </xsd:complexType>
+</xsd:schema>

@@ -47,6 +47,11 @@
             <tag name="cache.pool" />
         </service>
 
+        <service id="api_platform.metadata.resource_collection.metadata_factory.xml" class="ApiPlatform\Core\Metadata\ResourceCollection\Factory\ExtractorResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource_collection.metadata_factory" public="false">
+            <argument type="service" id="api_platform.metadata.resource_collection.extractor.xml" />
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory.xml.inner" />
+            <argument>%api_platform.defaults%</argument>
+        </service>
     </services>
 
 </container>

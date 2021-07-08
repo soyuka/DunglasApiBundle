@@ -15,3 +15,18 @@ resources:
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
         shortName: single_file_config
         description: File configured resource
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Program:
+        -   ~
+        -   uriTemplate: /users/{author}/programs
+            identifiers: ['author']
+            types: ['someirischema']
+            description: User programs
+            operations:
+                ApiPlatform\Metadata\GetCollection: ~
+                ApiPlatform\Metadata\Get:
+                    uriTemplate: /users/{userId}/programs/{id}
+                    types: ['anotheririschema']
+                    identifiers:
+                        userId: [ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Program, 'author']
+                        id: [ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Program, 'id']

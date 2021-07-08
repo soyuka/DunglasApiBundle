@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata-3.0
+           https://api-platform.com/schema/metadata/metadata-3.0.xsd">
+    <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Comment"/>
+
+    <resource
+        class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Comment"
+        uriTemplate="/users/{author}/comments"
+        description="User comments">
+        <types>
+            <type>someirischema</type>
+        </types>
+
+        <identifiers>
+            <identifier key="author"/>
+        </identifiers>
+
+        <operations>
+            <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
+            <operation class="ApiPlatform\Metadata\Get">
+                <attribute name="uriTemplate">/users/{userId}/comments/{id}</attribute>
+                <attribute name="identifiers">
+                    <attribute name="userId">
+                        <attribute>ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Comment</attribute>
+                        <attribute>author</attribute>
+                    </attribute>
+                    <attribute name="id">
+                        <attribute>ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Comment</attribute>
+                        <attribute>id</attribute>
+                    </attribute>
+                </attribute>
+            </operation>
+        </operations>
+    </resource>
+</resources>
