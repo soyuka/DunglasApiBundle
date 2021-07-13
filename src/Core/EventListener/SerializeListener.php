@@ -68,10 +68,19 @@ final class SerializeListener
         $operation = $this->initializeOperation($request);
 
         if (
-            $controllerResult instanceof Response
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !$request->attributes->getBoolean('_api_respond', true)
+            (
+                $controllerResult instanceof Response
+                || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+                || !$request->attributes->getBoolean('_api_respond', true)
+            )
+            && !$request->attributes->get('_api_normalization_context', [])
         ) {
+            return;
+        }
+
+        if (!$attributes) {
+            $this->serializeRawData($event, $request, $controllerResult);
+
             return;
         }
 
@@ -83,12 +92,6 @@ final class SerializeListener
 
         // TODO: 3.0 remove condition
         if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)) {
-            return;
-        }
-
-        if (!$attributes) {
-            $this->serializeRawData($event, $request, $controllerResult);
-
             return;
         }
 

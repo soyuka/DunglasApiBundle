@@ -60,7 +60,10 @@ final class RespondListener
         $operation = $this->initializeOperation($request);
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
-        if ($controllerResult instanceof Response || $request->attributes->getBoolean('_api_respond', false)) {
+        if (
+            ($controllerResult instanceof Response || $request->attributes->getBoolean('_api_respond', false))
+            && !$request->attributes->get('_api_normalization_context', [])
+        ) {
             return;
         }
 
