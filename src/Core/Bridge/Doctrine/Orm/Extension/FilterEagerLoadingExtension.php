@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -32,8 +33,12 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
     private $resourceClassResolver;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct($resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
         $this->resourceClassResolver = $resourceClassResolver;

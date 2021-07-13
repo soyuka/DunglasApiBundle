@@ -47,6 +47,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
         }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 

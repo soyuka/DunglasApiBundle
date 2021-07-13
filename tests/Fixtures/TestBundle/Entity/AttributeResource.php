@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\ApiResource;
 
 #[ApiResource(normalizationContext: ['skip_null_values' => true])]
 #[Get]

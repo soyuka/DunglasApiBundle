@@ -30,8 +30,8 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
  */
 final class ValidateListener
 {
-    use ToggleableOperationAttributeTrait;
     use OperationRequestInitiatorTrait;
+    use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'validate';
 

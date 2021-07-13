@@ -23,6 +23,7 @@ use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterfa
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
@@ -72,7 +73,7 @@ final class PublishMercureUpdatesListener
      * @param array<string, string[]|string> $formats
      * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -80,6 +81,7 @@ final class PublishMercureUpdatesListener
 
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->serializer = $serializer;
         $this->formats = $formats;
@@ -169,7 +171,7 @@ final class PublishMercureUpdatesListener
             return;
         }
 
-        $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);;
 
         if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
@@ -261,7 +263,12 @@ final class PublishMercureUpdatesListener
             $data = json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
-            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+                $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext();
+            } else {
+                // TODO: remove in 3.0
+                $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
+            }
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);

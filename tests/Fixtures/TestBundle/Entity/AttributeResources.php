@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\ApiResource;
 use IteratorAggregate;
 
 #[ApiResource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]

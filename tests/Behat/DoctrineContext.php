@@ -107,7 +107,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarIdentifier;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
